@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-03-21T00:00:00.000Z" agent="Claude" version="21.0.0" type="device">
+  <diagram id="email-humanizer-architecture" name="Email Humanizer Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="LangChain Email Humanizer -- Agent Architecture" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="800" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ================================================== -->
+        <!-- SECTION 1: High-Level LangChain Pipeline            -->
+        <!-- ================================================== -->
+        <mxCell id="section1_label" value="1. Core LangChain Pipeline" style="text;html=1;fontSize=14;fontStyle=1;align=left;fontColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- User Input -->
+        <mxCell id="s1_input" value="&lt;b&gt;User Input&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;&quot;thank my team for Q4&quot;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontColor=#1e3a5f;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow 1 -->
+        <mxCell id="s1_a1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s1_input" target="s1_prompt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Prompt Template -->
+        <mxCell id="s1_prompt" value="&lt;b&gt;Prompt Template&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Fills {placeholders}&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontColor=#3b0764;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="120" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow 2 -->
+        <mxCell id="s1_a2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s1_prompt" target="s1_llm">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- LLM -->
+        <mxCell id="s1_llm" value="&lt;b&gt;LLM (OpenAI GPT)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Generates text&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#052e16;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="520" y="120" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow 3 -->
+        <mxCell id="s1_a3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s1_llm" target="s1_output">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Output -->
+        <mxCell id="s1_output" value="&lt;b&gt;Output&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Generated response&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#78350f;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="760" y="120" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ================================================== -->
+        <!-- SECTION 2: Agent Tool-Calling Loop                  -->
+        <!-- ================================================== -->
+        <mxCell id="section2_label" value="2. Agent Tool-Calling Loop" style="text;html=1;fontSize=14;fontStyle=1;align=left;fontColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Loop container -->
+        <mxCell id="loop_container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#94a3b8;strokeWidth=2;dashed=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="290" width="540" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="loop_label" value="REPEATS UNTIL DONE" style="text;html=1;fontSize=10;fontStyle=1;align=center;fontColor=#94a3b8;" vertex="1" parent="1">
+          <mxGeometry x="430" y="270" width="180" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Receive -->
+        <mxCell id="s2_receive" value="&lt;b&gt;RECEIVE&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;User message&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontColor=#1e3a5f;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="60" y="310" width="130" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow to Think -->
+        <mxCell id="s2_a1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s2_receive" target="s2_think">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Think -->
+        <mxCell id="s2_think" value="&lt;b&gt;THINK&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;LLM decides next step&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#78350f;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="270" y="310" width="140" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow to Act -->
+        <mxCell id="s2_a2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s2_think" target="s2_act">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Act -->
+        <mxCell id="s2_act" value="&lt;b&gt;ACT&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Call a tool&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontColor=#3b0764;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="450" y="310" width="140" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow to Observe -->
+        <mxCell id="s2_a3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s2_act" target="s2_observe">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Observe -->
+        <mxCell id="s2_observe" value="&lt;b&gt;OBSERVE&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Read tool result&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#052e16;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="630" y="310" width="140" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Loop back arrow from Observe to Think -->
+        <mxCell id="s2_loop" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="s2_observe" target="s2_think">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="400"/>
+              <mxPoint x="340" y="400"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow to Respond -->
+        <mxCell id="s2_a4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="s2_observe" target="s2_respond">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Respond -->
+        <mxCell id="s2_respond" value="&lt;b&gt;RESPOND&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Final answer&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontColor=#831843;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="830" y="310" width="130" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ================================================== -->
+        <!-- SECTION 3: Email Humanizer Project Flow             -->
+        <!-- ================================================== -->
+        <mxCell id="section3_label" value="3. Email Humanizer -- Project Flow" style="text;html=1;fontSize=14;fontStyle=1;align=left;fontColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="40" y="440" width="400" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- User -->
+        <mxCell id="p_user" value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;&quot;thank my team for&lt;br&gt;finishing the project&quot;&lt;/font&gt;" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#dbeafe;strokeColor=#2563eb;fontColor=#1e3a5f;size=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow to Agent -->
+        <mxCell id="p_a1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#64748b;strokeWidth=2;" edge="1" parent="1" source="p_user" target="p_agent">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Agent Box -->
+        <mxCell id="p_agent" value="&lt;b&gt;Agent&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;create_agent()&lt;br&gt;LLM + Tools + System Prompt&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#78350f;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="290" y="500" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow to Tool 1 -->
+        <mxCell id="p_a2" value="Step 1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#7c3aed;strokeWidth=2;fontColor=#7c3aed;fontSize=10;" edge="1" parent="1" source="p_agent" target="p_tool1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Tool 1: draft_email -->
+        <mxCell id="p_tool1" value="&lt;b&gt;Tool: draft_email&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;PromptTemplate + LLM&lt;br&gt;Creates formal email draft&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontColor=#3b0764;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="490" width="200" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow from Tool 1 to LLM 1 -->
+        <mxCell id="p_a3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#16a34a;strokeWidth=2;" edge="1" parent="1" source="p_tool1" target="p_llm1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- LLM Call 1 -->
+        <mxCell id="p_llm1" value="&lt;b&gt;GPT-4.1-mini&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Generates draft&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#052e16;" vertex="1" parent="1">
+          <mxGeometry x="830" y="490" width="140" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow back from LLM 1 to Agent (draft result) -->
+        <mxCell id="p_a4" value="draft result" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=1;dashed=1;fontColor=#94a3b8;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="p_llm1" target="p_agent">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="900" y="600"/>
+              <mxPoint x="390" y="600"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow from Agent to Tool 2 -->
+        <mxCell id="p_a5" value="Step 2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#db2777;strokeWidth=2;fontColor=#db2777;fontSize=10;" edge="1" parent="1" source="p_agent" target="p_tool2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Tool 2: humanize_email -->
+        <mxCell id="p_tool2" value="&lt;b&gt;Tool: humanize_email&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;PromptTemplate + LLM&lt;br&gt;Rewrites to sound natural&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontColor=#831843;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="630" width="200" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow from Tool 2 to LLM 2 -->
+        <mxCell id="p_a6" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#16a34a;strokeWidth=2;" edge="1" parent="1" source="p_tool2" target="p_llm2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- LLM Call 2 -->
+        <mxCell id="p_llm2" value="&lt;b&gt;GPT-4.1-mini&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Humanizes text&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#052e16;" vertex="1" parent="1">
+          <mxGeometry x="830" y="630" width="140" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow back from LLM 2 to Agent (humanized result) -->
+        <mxCell id="p_a7" value="humanized result" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#94a3b8;strokeWidth=1;dashed=1;fontColor=#94a3b8;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="p_llm2" target="p_agent">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="900" y="740"/>
+              <mxPoint x="290" y="740"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow from Agent to Final Output -->
+        <mxCell id="p_a8" value="Step 3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0891b2;strokeWidth=2;fontColor=#0891b2;fontSize=10;" edge="1" parent="1" source="p_agent" target="p_output">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="540"/>
+              <mxPoint x="200" y="780"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Final Output -->
+        <mxCell id="p_output" value="&lt;b&gt;Final Humanized Email&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Warm, natural email&lt;br&gt;returned to the user&lt;/font&gt;" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#cffafe;strokeColor=#0891b2;fontColor=#083344;size=15;" vertex="1" parent="1">
+          <mxGeometry x="290" y="760" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ================================================== -->
+        <!-- SECTION 4: Component Legend                         -->
+        <!-- ================================================== -->
+        <mxCell id="section4_label" value="4. Components Used" style="text;html=1;fontSize=14;fontStyle=1;align=left;fontColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="40" y="870" width="300" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend1" value="&lt;b&gt;ChatOpenAI&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;LLM wrapper for OpenAI API&lt;br&gt;langchain_openai.ChatOpenAI&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#052e16;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="910" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend2" value="&lt;b&gt;PromptTemplate&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Reusable template with {placeholders}&lt;br&gt;langchain_core.prompts&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontColor=#3b0764;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="910" width="220" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend3" value="&lt;b&gt;@tool decorator&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Registers a function as an agent tool&lt;br&gt;langchain_core.tools&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce7f3;strokeColor=#db2777;fontColor=#831843;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="910" width="220" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend4" value="&lt;b&gt;create_agent&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Combines LLM + tools + prompt&lt;br&gt;langchain.agents&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#78350f;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="910" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

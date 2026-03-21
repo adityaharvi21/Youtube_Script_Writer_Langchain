@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangChain Architecture - Email Humanizer Agent</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #f8fafc;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 48px;
+  }
+
+  /* ---- Section titles ---- */
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #38bdf8;
+    margin-bottom: 24px;
+    padding-left: 12px;
+    border-left: 3px solid #38bdf8;
+  }
+  .section { margin-bottom: 56px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+
+  /* ---- Flow diagram (horizontal boxes + arrows) ---- */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .flow-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px 24px;
+    min-width: 150px;
+    text-align: center;
+    position: relative;
+  }
+  .flow-box .label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .flow-box .desc {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+  .flow-box.blue   { border-color: #3b82f6; }
+  .flow-box.blue .label  { color: #60a5fa; }
+  .flow-box.green  { border-color: #22c55e; }
+  .flow-box.green .label { color: #4ade80; }
+  .flow-box.purple { border-color: #a855f7; }
+  .flow-box.purple .label { color: #c084fc; }
+  .flow-box.amber  { border-color: #f59e0b; }
+  .flow-box.amber .label  { color: #fbbf24; }
+  .flow-box.rose   { border-color: #f43f5e; }
+  .flow-box.rose .label   { color: #fb7185; }
+
+  .arrow {
+    font-size: 24px;
+    color: #475569;
+    padding: 0 8px;
+    user-select: none;
+  }
+
+  /* ---- Agent loop diagram ---- */
+  .agent-loop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .loop-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .loop-step {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 180px;
+    text-align: center;
+  }
+  .loop-step .step-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .loop-step .step-text {
+    font-size: 13px;
+    color: #cbd5e1;
+  }
+  .loop-step.s1 { border-color: #3b82f6; }
+  .loop-step.s1 .step-num { color: #60a5fa; }
+  .loop-step.s2 { border-color: #f59e0b; }
+  .loop-step.s2 .step-num { color: #fbbf24; }
+  .loop-step.s3 { border-color: #a855f7; }
+  .loop-step.s3 .step-num { color: #c084fc; }
+  .loop-step.s4 { border-color: #22c55e; }
+  .loop-step.s4 .step-num { color: #4ade80; }
+
+  .down-arrow {
+    font-size: 22px;
+    color: #475569;
+    padding: 4px 0;
+    text-align: center;
+  }
+
+  .loop-bracket {
+    border: 2px dashed #334155;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    margin: 0 auto;
+  }
+  .loop-label {
+    position: absolute;
+    top: -12px;
+    left: 24px;
+    background: #0f172a;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.5px;
+  }
+
+  /* ---- Project-specific diagram ---- */
+  .project-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .pf-box {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 16px 28px;
+    text-align: center;
+    min-width: 320px;
+    border: 1px solid #334155;
+  }
+  .pf-box .pf-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .pf-box .pf-desc {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .pf-box.user     { border-color: #3b82f6; background: #1e3a5f; }
+  .pf-box.user .pf-label   { color: #93c5fd; }
+  .pf-box.agent    { border-color: #f59e0b; background: #2d2305; }
+  .pf-box.agent .pf-label  { color: #fcd34d; }
+  .pf-box.tool1    { border-color: #a855f7; background: #2e1065; }
+  .pf-box.tool1 .pf-label  { color: #d8b4fe; }
+  .pf-box.llm      { border-color: #22c55e; background: #052e16; }
+  .pf-box.llm .pf-label    { color: #86efac; }
+  .pf-box.tool2    { border-color: #f43f5e; background: #4c0519; }
+  .pf-box.tool2 .pf-label  { color: #fda4af; }
+  .pf-box.output   { border-color: #06b6d4; background: #083344; }
+  .pf-box.output .pf-label { color: #67e8f9; }
+
+  .pf-arrow {
+    font-size: 20px;
+    color: #475569;
+    padding: 6px 0;
+  }
+  .pf-note {
+    font-size: 11px;
+    color: #64748b;
+    font-style: italic;
+  }
+
+  /* ---- Legend ---- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* ---- Key concepts table ---- */
+  .concepts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .concept-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .concept-card .cc-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .concept-card .cc-body {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+  .concept-card .cc-code {
+    font-family: 'Consolas', 'Fira Code', monospace;
+    background: #0f172a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #7dd3fc;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 12px;
+    color: #475569;
+  }
+</style>
+</head>
+<body>
+
+<h1>LangChain Architecture</h1>
+<p class="subtitle">How LangChain works -- from core concepts to a working agent</p>
+
+<!-- ============================================ -->
+<!-- SECTION 1: Core LangChain Pipeline           -->
+<!-- ============================================ -->
+<div class="section">
+  <div class="section-title">1. Core LangChain Pipeline</div>
+
+  <div class="flow">
+    <div class="flow-box blue">
+      <div class="label">User Input</div>
+      <div class="desc">"Write a thank-you<br>email to my team"</div>
+    </div>
+    <div class="arrow">--></div>
+    <div class="flow-box purple">
+      <div class="label">Prompt Template</div>
+      <div class="desc">Fills placeholders<br>with user input</div>
+    </div>
+    <div class="arrow">--></div>
+    <div class="flow-box green">
+      <div class="label">LLM (OpenAI GPT)</div>
+      <div class="desc">Generates text<br>based on prompt</div>
+    </div>
+    <div class="arrow">--></div>
+    <div class="flow-box amber">
+      <div class="label">Output</div>
+      <div class="desc">The generated<br>response text</div>
+    </div>
+  </div>
+
+  <div class="legend" style="margin-top: 24px;">
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Input</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div> Prompt</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Model</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Output</div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 2: What makes an Agent               -->
+<!-- ============================================ -->
+<div class="section">
+  <div class="section-title">2. What Makes an Agent (vs a simple chain)</div>
+
+  <div style="display:flex; gap:40px; justify-content:center; flex-wrap:wrap;">
+    <!-- Simple Chain -->
+    <div style="text-align:center;">
+      <div style="font-size:13px; font-weight:600; color:#94a3b8; margin-bottom:12px;">SIMPLE CHAIN (no agent)</div>
+      <div class="flow" style="flex-direction:column; gap:0;">
+        <div class="flow-box blue" style="min-width:200px;"><div class="label">Input</div></div>
+        <div class="down-arrow">|</div>
+        <div class="flow-box green" style="min-width:200px;"><div class="label">LLM</div></div>
+        <div class="down-arrow">|</div>
+        <div class="flow-box amber" style="min-width:200px;"><div class="label">Output</div></div>
+      </div>
+      <div class="pf-note" style="margin-top:8px;">Fixed path, no decisions</div>
+    </div>
+
+    <!-- Agent -->
+    <div style="text-align:center;">
+      <div style="font-size:13px; font-weight:600; color:#fbbf24; margin-bottom:12px;">AGENT (with tools)</div>
+      <div class="flow" style="flex-direction:column; gap:0;">
+        <div class="flow-box blue" style="min-width:200px;"><div class="label">Input</div></div>
+        <div class="down-arrow">|</div>
+        <div class="loop-bracket" style="display:inline-block;">
+          <div class="loop-label">TOOL-CALLING LOOP</div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+            <div class="flow-box green" style="min-width:200px;"><div class="label">LLM Thinks</div><div class="desc">Which tool to use?</div></div>
+            <div class="down-arrow">|</div>
+            <div class="flow-box purple" style="min-width:200px;"><div class="label">Calls Tool</div><div class="desc">Runs the function</div></div>
+            <div class="down-arrow">|</div>
+            <div class="flow-box rose" style="min-width:200px;"><div class="label">Observes Result</div><div class="desc">Reads tool output</div></div>
+            <div style="font-size:11px; color:#64748b; padding:8px 0;">Repeats until done</div>
+          </div>
+        </div>
+        <div class="down-arrow">|</div>
+        <div class="flow-box amber" style="min-width:200px;"><div class="label">Final Answer</div></div>
+      </div>
+      <div class="pf-note" style="margin-top:8px;">Dynamic, LLM decides the path</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 3: Agent Loop Detail                 -->
+<!-- ============================================ -->
+<div class="section">
+  <div class="section-title">3. Agent Tool-Calling Loop (Step by Step)</div>
+
+  <div class="agent-loop">
+    <div class="loop-step s1">
+      <div class="step-num">STEP 1 -- RECEIVE</div>
+      <div class="step-text">User sends a message to the agent</div>
+    </div>
+    <div class="down-arrow">v</div>
+
+    <div class="loop-bracket" style="width: fit-content;">
+      <div class="loop-label">REPEATS UNTIL LLM GIVES FINAL ANSWER</div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+        <div class="loop-step s2">
+          <div class="step-num">STEP 2 -- THINK</div>
+          <div class="step-text">LLM reads messages + tool descriptions<br>and decides what to do next</div>
+        </div>
+        <div class="down-arrow">v</div>
+        <div class="loop-step s3">
+          <div class="step-num">STEP 3 -- ACT</div>
+          <div class="step-text">LLM calls a tool with specific arguments<br>(e.g., draft_email with the user's idea)</div>
+        </div>
+        <div class="down-arrow">v</div>
+        <div class="loop-step s4">
+          <div class="step-num">STEP 4 -- OBSERVE</div>
+          <div class="step-text">Tool runs and returns its result<br>Result is added to the message history</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="down-arrow">v</div>
+    <div class="loop-step s1">
+      <div class="step-num">STEP 5 -- RESPOND</div>
+      <div class="step-text">LLM returns a final text answer to the user</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 4: Our Email Humanizer Flow          -->
+<!-- ============================================ -->
+<div class="section">
+  <div class="section-title">4. Email Humanizer -- Full Agent Flow</div>
+
+  <div class="project-flow">
+    <div class="pf-box user">
+      <div class="pf-label">User Input</div>
+      <div class="pf-desc">"thank my team for finishing the project on time"</div>
+    </div>
+    <div class="pf-arrow">v</div>
+
+    <div class="pf-box agent">
+      <div class="pf-label">Agent (create_agent)</div>
+      <div class="pf-desc">LLM + Tools + System Prompt wired together</div>
+    </div>
+    <div class="pf-arrow">v</div>
+    <div class="pf-note">Agent thinks: "I should draft this email first"</div>
+    <div class="pf-arrow">v</div>
+
+    <div class="pf-box tool1">
+      <div class="pf-label">Tool 1: draft_email</div>
+      <div class="pf-desc">PromptTemplate + LLM --> structured formal email</div>
+    </div>
+    <div class="pf-arrow">v</div>
+
+    <div class="pf-box llm">
+      <div class="pf-label">LLM (GPT-4o-mini)</div>
+      <div class="pf-desc">Generates the formal draft</div>
+    </div>
+    <div class="pf-arrow">v</div>
+    <div class="pf-note">Agent observes draft, thinks: "Now I should humanize it"</div>
+    <div class="pf-arrow">v</div>
+
+    <div class="pf-box tool2">
+      <div class="pf-label">Tool 2: humanize_email</div>
+      <div class="pf-desc">PromptTemplate + LLM --> warm, natural rewrite</div>
+    </div>
+    <div class="pf-arrow">v</div>
+
+    <div class="pf-box llm">
+      <div class="pf-label">LLM (GPT-4o-mini)</div>
+      <div class="pf-desc">Rewrites with contractions, warmth, personality</div>
+    </div>
+    <div class="pf-arrow">v</div>
+    <div class="pf-note">Agent observes result, thinks: "This looks good, done!"</div>
+    <div class="pf-arrow">v</div>
+
+    <div class="pf-box output">
+      <div class="pf-label">Final Humanized Email</div>
+      <div class="pf-desc">Returned to the user</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 5: Key Concepts                      -->
+<!-- ============================================ -->
+<div class="section">
+  <div class="section-title">5. Key LangChain Concepts Used</div>
+
+  <div class="concepts">
+    <div class="concept-card">
+      <div class="cc-title" style="color:#60a5fa;">ChatOpenAI</div>
+      <div class="cc-body">
+        The LLM wrapper. Sends prompts to OpenAI's API and returns responses.
+        Like a phone line to GPT.<br>
+        <span class="cc-code">from langchain_openai import ChatOpenAI</span>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-title" style="color:#c084fc;">PromptTemplate</div>
+      <div class="cc-body">
+        A reusable template with <span class="cc-code">{placeholders}</span> that get filled
+        before sending to the LLM. Like a form with blanks.<br>
+        <span class="cc-code">from langchain_core.prompts import PromptTemplate</span>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-title" style="color:#fbbf24;">@tool Decorator</div>
+      <div class="cc-body">
+        Turns a Python function into a tool the agent can call.
+        The docstring becomes the tool's description -- the agent reads it to decide when to use it.<br>
+        <span class="cc-code">from langchain_core.tools import tool</span>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-title" style="color:#4ade80;">create_agent</div>
+      <div class="cc-body">
+        Combines an LLM + tools + system prompt into a runnable agent.
+        The agent loops: call LLM --> call tool --> feed result back --> repeat until done.<br>
+        <span class="cc-code">from langchain.agents import create_agent</span>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-title" style="color:#fb7185;">System Prompt</div>
+      <div class="cc-body">
+        Instructions that tell the agent its role and behavior.
+        Like giving an employee a job description before they start work.
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-title" style="color:#67e8f9;">HumanMessage</div>
+      <div class="cc-body">
+        Represents the user's input in LangChain's message format.
+        The agent receives a list of messages and responds accordingly.<br>
+        <span class="cc-code">from langchain_core.messages import HumanMessage</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  LangChain Email Humanizer -- Architecture Diagram
+</div>
+
+</body>
+</html>
